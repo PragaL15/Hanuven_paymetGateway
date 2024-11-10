@@ -7,7 +7,9 @@ import Footer from "../Components/Footer";
 import Header from "../Components/Header";
 import Summary from "../Components/Summary";
 import Counter from "../Components/Counter";
-import EmptyCartImage from "../assets/EmptyCart.png"; // Import the EmptyCart image
+import EmptyCartImage from "../assets/EmptyCart.png"; 
+import ProductImage from "../Components/Assets/slider4.jpg"
+
 
 const Cart = () => {
   const { cart, removeFromCart, updateQuantity } = useCart();
@@ -34,10 +36,10 @@ const Cart = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg w-2/3">
             {cart.length > 0 && (
               <div className="grid grid-cols-4 gap-4 border-b pb-4 mb-4 font-semibold text-gray-600">
-                <div>Product Name</div>
-                <div>Price</div>
-                <div>Quantity</div>
-                <div>Action</div>
+                <div className="ml-2">Product Name</div>
+                <div className="ml-64">Price</div>
+                <div className="ml-44">Quantity</div>
+                <div className="ml-28">Action</div>
               </div>
             )}
 
@@ -49,7 +51,7 @@ const Cart = () => {
                 <img
                   src={EmptyCartImage}
                   alt="Empty Cart"
-                  className="mx-auto w-29 h-20 mt-4"
+                  className="mx-auto w-20 h-20 mt-4"
                 />
                         <div className="flex items-center justify-between mt-10 p-6 rounded-lg ">
         
@@ -67,16 +69,12 @@ const Cart = () => {
                   key={item.id}
                   className="flex items-center justify-between mb-4 p-4 border rounded-lg"
                 >
-                  <img
-                    src={item.image || "../assets/defaultProductImage.jpg"}
-                    alt={item.name}
-                    className="w-16 h-16 object-cover rounded"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "../assets/defaultProductImage.jpg";
-                    }}
-                  />
-                  <div className="flex-1 ml-1 max-w-[6rem] whitespace-normal">
+                   <img
+                  src={ProductImage}
+                  alt="Product Image"
+                  className="mx-auto w-20 h-20 ml-3"
+                />
+                  <div className="flex-1 whitespace-normal">
                     <span className="block font-semibold text-gray-800">
                       {item.name}
                     </span>
