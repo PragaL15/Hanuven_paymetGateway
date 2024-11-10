@@ -5,8 +5,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
-import Summary from "../Components/summary";
-import Counter from "../Components/Counter.jsx"; // Import the Counter component
+import Summary from "../Components/Summary";
+import Counter from "../Components/Counter";
+import EmptyCartImage from "../assets/EmptyCart.png"; // Import the EmptyCart image
 
 const Cart = () => {
   const { cart, removeFromCart, updateQuantity } = useCart();
@@ -33,17 +34,33 @@ const Cart = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg w-2/3">
             {cart.length > 0 && (
               <div className="grid grid-cols-4 gap-4 border-b pb-4 mb-4 font-semibold text-gray-600">
-                <div className="ml-6">Product Name</div>
-                <div className="ml-40">Price</div>
-                <div className="ml-32">Quantity</div>
-                <div className="ml-28">Action</div>
+                <div>Product Name</div>
+                <div>Price</div>
+                <div>Quantity</div>
+                <div>Action</div>
               </div>
             )}
 
             {cart.length === 0 ? (
-              <h3 className="text-center text-xl text-gray-700 py-6">
-                Your cart is empty! Click Continue Shopping to add items.
-              </h3>
+              <div className="text-center py-6">
+                <h3 className="text-xl text-gray-700">
+                  Your cart is empty! Click Continue Shopping to add items.
+                </h3>
+                <img
+                  src={EmptyCartImage}
+                  alt="Empty Cart"
+                  className="mx-auto w-29 h-20 mt-4"
+                />
+                        <div className="flex items-center justify-between mt-10 p-6 rounded-lg ">
+        
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center justify-center ml-64"
+            onClick={handleContinueShopping}
+          >
+            CONTINUE SHOPPING
+          </button>
+        </div>
+              </div>
             ) : (
               cart.map((item) => (
                 <div
@@ -51,19 +68,26 @@ const Cart = () => {
                   className="flex items-center justify-between mb-4 p-4 border rounded-lg"
                 >
                   <img
-                    src={`./src/Components/Assets/slider4.jpg`}
+                    src={item.image || "../assets/defaultProductImage.jpg"}
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded"
-                    onError={() => console.error(`Image failed to load: ${item.image}`)}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "../assets/defaultProductImage.jpg";
+                    }}
                   />
-                 <div className="flex-1 ml-4 max-w-[6rem] whitespace-normal">
-    <span className="block font-semibold text-gray-800">{item.name}</span>
-</div>
+                  <div className="flex-1 ml-1 max-w-[6rem] whitespace-normal">
+                    <span className="block font-semibold text-gray-800">
+                      {item.name}
+                    </span>
+                  </div>
 
                   <div>
-                  <span className="block text-gray-500 ml-20">₹{item.price.toFixed(2)}</span>
-                    </div>
-                  <div className="flex items-center space-x-2 ml-10">
+                    <span className="block text-gray-500 ml-12">
+                      ₹{item.price.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2 ml-12">
                     <Counter
                       initialCount={item.quantity || 1}
                       onIncrement={() => handleQuantityChange(item.id, 1)}
@@ -94,18 +118,7 @@ const Cart = () => {
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-10 p-6 bg-gray-50 rounded-lg shadow-md">
-          <div className="text-gray-700">
-            <h4 className="text-lg font-semibold">Continue Shopping</h4>
-            <p>Add more items to your cart</p>
-          </div>
-          <button
-            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={handleContinueShopping}
-          >
-            CONTINUE SHOPPING
-          </button>
-        </div>
+
       </div>
 
       <Footer />
