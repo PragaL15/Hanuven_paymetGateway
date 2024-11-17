@@ -2,20 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom'; 
 import { useCart } from './CartContext'; 
 import Header from "../Components/Header";
-import Summary from '../Components/summary';
+import Summary from '../Components/Summary';
 
 const Checkout = () => {
   const location = useLocation();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState({
+    street: localStorage.getItem('street') || '',
+    city: localStorage.getItem('city') || '',
+    zip: localStorage.getItem('zip') || '',
+  });
   const [shipping, setShipping] = useState('India');
   const [contact, setContact] = useState('');
   const [errors, setErrors] = useState({});
   const { calculateTotal } = useCart();
+  const { cart } = useCart();
 
   const product = location.state?.product;
   const totalAmount = product ? product.price : calculateTotal();
+  const totalQuantity = cart.reduce((acc, item) => acc + (item.quantity || 0), 0);
 
   useEffect(() => {
     const savedValues = {
@@ -99,10 +105,10 @@ const Checkout = () => {
   return (
     <div>
       <Header />
-      <div className="checkout-container flex ml-56 py-5 ">
+      <div className="checkout-container flex md:ml-20 py-5 ">
         <div className="checkout-page flex flex-col  min-h-screen py-5 w-full">
           <h1 className="text-2xl font-semibold text-gray-800 mb-5">Billing</h1>
-          <div className="checkout-form bg-slate-50 p-6 rounded-lg shadow-md w-full max-w-lg">
+          <div className="checkout-form bg-slate-50 p-6 rounded-lg shadow-md w-full max-w-2xl">
             <h2 className="text-2xl font-semibold mb-6 text-gray-800"></h2>
             <div className="form-group mb-4">
               <label className="block text-gray-700 font-medium mb-1">Email</label>
@@ -133,19 +139,47 @@ const Checkout = () => {
               {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
             </div>
             <div className="form-group mb-4">
-              <label className="block text-gray-700 font-medium mb-1">Shipping Address</label>
+              <label className="block text-gray-700 font-medium mb-1">Street Address</label>
               <input
                 type="text"
-                value={address}
+                value={address.street}
                 onChange={(e) => {
-                  setAddress(e.target.value);
-                  localStorage.setItem('address', e.target.value);
+                  setAddress({ ...address, street: e.target.value });
+                  localStorage.setItem('street', e.target.value);
                   setErrors({ ...errors, address: '' });
                 }}
                 className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
               />
-              {errors.address && <span className="text-red-500 text-sm">{errors.address}</span>}
             </div>
+
+            <div className="form-group mb-4">
+              <label className="block text-gray-700 font-medium mb-1">City</label>
+              <input
+                type="text"
+                value={address.city}
+                onChange={(e) => {
+                  setAddress({ ...address, city: e.target.value });
+                  localStorage.setItem('city', e.target.value);
+                  setErrors({ ...errors, address: '' });
+                }}
+                className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            <div className="form-group mb-4">
+              <label className="block text-gray-700 font-medium mb-1">Zip Code</label>
+              <input
+                type="text"
+                value={address.zip}
+                onChange={(e) => {
+                  setAddress({ ...address, zip: e.target.value });
+                  localStorage.setItem('zip', e.target.value);
+                  setErrors({ ...errors, address: '' });
+                }}
+                className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
             <div className="form-group mb-4">
               <label className="block text-gray-700 font-medium mb-1">Country</label>
               <select
@@ -162,6 +196,7 @@ const Checkout = () => {
                 <option value="UK">UK</option>
               </select>
             </div>
+
             <div className="form-group mb-4">
               <label className="block text-gray-700 font-medium mb-1">Contact Number</label>
               <input
@@ -191,9 +226,9 @@ const Checkout = () => {
             </button>
           </div>
         </div>
-        <div className="md:-ml-96 md:mt-16">
-          <Summary calculateTotal={calculateTotal} />
-        </div>
+        <div className="hidden lg:block md:-ml-96 md:mt-16">
+  <Summary calculateTotal={calculateTotal} totalQuantity={totalQuantity} />
+</div>
       </div>
     </div>
   );
