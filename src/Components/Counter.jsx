@@ -17,22 +17,21 @@ const Counter = ({ initialCount, onIncrement, onDecrement }) => {
   const decrement = () => {
     if (count > 1) {
       setCount(count - 1);
-      onDecrement(); // Call parent decrement function
+      onDecrement(); 
     }
   };
 
   return (
     <div className="flex items-center justify-center bg-white p-1 rounded border border-gray-300">
-      {/* Decrement Button */}
       <button
         className="bg-white p-1 focus:outline-none cursor-pointer 
-                   sm:p-2" // Larger padding for screens >= sm
+                   sm:p-2" 
         onClick={decrement}
       >
         <RemoveIcon
-          className="text-black hover:bg-yellow-100 rounded-full"
+          className="text-black hover:bg-yellow-100 "
           style={{
-            width: "0.75rem", // Smaller icon size for mobile
+            width: "0.75rem", 
             height: "0.75rem",
           }}
         />

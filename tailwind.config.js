@@ -6,6 +6,10 @@ export default {
   ],
   theme: {
     extend: {},
+    fontSize: {
+      "xxs": "10px", // Changed from text to fontSize
+      "xxxs":"6px",
+    },
   },
   plugins: [],
 }

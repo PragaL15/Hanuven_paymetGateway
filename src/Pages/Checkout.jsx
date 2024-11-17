@@ -4,45 +4,47 @@ import { useCart } from './CartContext';
 import Header from "../Components/Header";
 import Summary from '../Components/Summary';
 
+// Custom hook for managing form data and persisting to localStorage
+const usePersistentState = (key, defaultValue) => {
+  const storedValue = localStorage.getItem(key);
+  const [value, setValue] = useState(storedValue || defaultValue);
+
+  useEffect(() => {
+    if (value) {
+      localStorage.setItem(key, value);
+    }
+  }, [value, key]);
+
+  return [value, setValue];
+};
+
 const Checkout = () => {
   const location = useLocation();
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState({
-    street: localStorage.getItem('street') || '',
-    city: localStorage.getItem('city') || '',
-    zip: localStorage.getItem('zip') || '',
-  });
-  const [shipping, setShipping] = useState('India');
-  const [contact, setContact] = useState('');
-  const [errors, setErrors] = useState({});
-  const { calculateTotal } = useCart();
-  const { cart } = useCart();
+  const { calculateTotal, cart } = useCart();
 
   const product = location.state?.product;
   const totalAmount = product ? product.price : calculateTotal();
   const totalQuantity = cart.reduce((acc, item) => acc + (item.quantity || 0), 0);
 
-  useEffect(() => {
-    const savedValues = {
-      email: localStorage.getItem('email') || '',
-      name: localStorage.getItem('name') || '',
-      address: localStorage.getItem('address') || '',
-      shipping: localStorage.getItem('shipping') || 'India',
-      contact: localStorage.getItem('contact') || '',
-    };
-    setEmail(savedValues.email);
-    setName(savedValues.name);
-    setAddress(savedValues.address);
-    setShipping(savedValues.shipping);
-    setContact(savedValues.contact);
-  }, []);
+  // Persistent states with default values
+  const [email, setEmail] = usePersistentState('email', '');
+  const [name, setName] = usePersistentState('name', '');
+  const [address, setAddress] = useState({
+    street: localStorage.getItem('street') || '',
+    city: localStorage.getItem('city') || '',
+    zip: localStorage.getItem('zip') || '',
+  });
+  const [shipping, setShipping] = usePersistentState('shipping', 'India');
+  const [contact, setContact] = usePersistentState('contact', '');
+  const [errors, setErrors] = useState({});
 
   const validateFields = () => {
     const newErrors = {};
     if (!email) newErrors.email = "Email is required";
     if (!name) newErrors.name = "Name is required";
-    if (!address) newErrors.address = "Address is required";
+    if (!address.street) newErrors.addressStreet = "Street Address is required";
+    if (!address.city) newErrors.addressCity = "City Address is required";
+    if (!address.zip) newErrors.addressZip = "Zipcode is required";
     if (!contact) newErrors.contact = "Contact number is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -91,7 +93,7 @@ const Checkout = () => {
         contact: contact,
       },
       notes: {
-        address: address,
+        address: JSON.stringify(address),
       },
       theme: {
         color: "#158993",
@@ -105,21 +107,16 @@ const Checkout = () => {
   return (
     <div>
       <Header />
-      <div className="checkout-container flex md:ml-20 py-5 ">
-        <div className="checkout-page flex flex-col  min-h-screen py-5 w-full">
+      <div className="checkout-container flex md:ml-20 mr-8 ml-4 py-5 ">
+        <div className="checkout-page flex flex-col min-h-screen py-5 w-full">
           <h1 className="text-2xl font-semibold text-gray-800 mb-5">Billing</h1>
-          <div className="checkout-form bg-slate-50 p-6 rounded-lg shadow-md w-full max-w-2xl">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800"></h2>
+          <div className="checkout-form bg-slate-100 p-6 rounded-lg shadow-md w-full ml-3 max-w-2xl">
             <div className="form-group mb-4">
               <label className="block text-gray-700 font-medium mb-1">Email</label>
               <input
                 type="email"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  localStorage.setItem('email', e.target.value);
-                  setErrors({ ...errors, email: '' });
-                }}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
               />
               {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
@@ -129,11 +126,7 @@ const Checkout = () => {
               <input
                 type="text"
                 value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  localStorage.setItem('name', e.target.value);
-                  setErrors({ ...errors, name: '' });
-                }}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
               />
               {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
@@ -143,13 +136,10 @@ const Checkout = () => {
               <input
                 type="text"
                 value={address.street}
-                onChange={(e) => {
-                  setAddress({ ...address, street: e.target.value });
-                  localStorage.setItem('street', e.target.value);
-                  setErrors({ ...errors, address: '' });
-                }}
+                onChange={(e) => setAddress({ ...address, street: e.target.value })}
                 className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
               />
+              {errors.addressStreet && <span className="text-red-500 text-sm">{errors.addressStreet}</span>}
             </div>
 
             <div className="form-group mb-4">
@@ -157,13 +147,10 @@ const Checkout = () => {
               <input
                 type="text"
                 value={address.city}
-                onChange={(e) => {
-                  setAddress({ ...address, city: e.target.value });
-                  localStorage.setItem('city', e.target.value);
-                  setErrors({ ...errors, address: '' });
-                }}
+                onChange={(e) => setAddress({ ...address, city: e.target.value })}
                 className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
               />
+              {errors.addressCity && <span className="text-red-500 text-sm">{errors.addressCity}</span>}
             </div>
 
             <div className="form-group mb-4">
@@ -171,23 +158,17 @@ const Checkout = () => {
               <input
                 type="text"
                 value={address.zip}
-                onChange={(e) => {
-                  setAddress({ ...address, zip: e.target.value });
-                  localStorage.setItem('zip', e.target.value);
-                  setErrors({ ...errors, address: '' });
-                }}
+                onChange={(e) => setAddress({ ...address, zip: e.target.value.replace(/[^0-9]/g, '') })}
                 className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
               />
+              {errors.addressZip && <span className="text-red-500 text-sm">{errors.addressZip}</span>}
             </div>
 
             <div className="form-group mb-4">
               <label className="block text-gray-700 font-medium mb-1">Country</label>
               <select
                 value={shipping}
-                onChange={(e) => {
-                  setShipping(e.target.value);
-                  localStorage.setItem('shipping', e.target.value);
-                }}
+                onChange={(e) => setShipping(e.target.value)}
                 className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
               >
                 <option value="India">India</option>
@@ -201,23 +182,21 @@ const Checkout = () => {
               <label className="block text-gray-700 font-medium mb-1">Contact Number</label>
               <input
                 type="text"
-                placeholder="Enter Contact Number"
                 value={contact}
-                onChange={(e) => {
-                  setContact(e.target.value);
-                  localStorage.setItem('contact', e.target.value);
-                  setErrors({ ...errors, contact: '' });
-                }}
+                onChange={(e) => setContact(e.target.value.replace(/[^0-9]/g, ''))}
+                maxLength={10}
                 className="w-full p-2 border rounded focus:outline-none focus:border-blue-500"
               />
               {errors.contact && <span className="text-red-500 text-sm">{errors.contact}</span>}
             </div>
+
             <div className="form-group mb-6">
               <label className="block text-gray-700 font-medium mb-1">Total Amount</label>
               <div className="amount-display text-xl font-semibold text-gray-800">
                 ₹{totalAmount.toFixed(2)}
               </div>
             </div>
+
             <button 
               className="pay-button w-full bg-blue-500 text-white font-bold py-2 rounded hover:bg-blue-600"
               onClick={pay}
@@ -227,8 +206,8 @@ const Checkout = () => {
           </div>
         </div>
         <div className="hidden lg:block md:-ml-96 md:mt-16">
-  <Summary calculateTotal={calculateTotal} totalQuantity={totalQuantity} />
-</div>
+          <Summary calculateTotal={calculateTotal} totalQuantity={totalQuantity} />
+        </div>
       </div>
     </div>
   );

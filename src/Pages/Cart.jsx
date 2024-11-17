@@ -22,6 +22,10 @@ const Cart = () => {
     return cart.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
   };
 
+  const TotalQuantity = () => {
+    return cart.reduce((acc, item) => acc + (item.quantity || 1), 0); // Summing all item quantities
+  };
+
   const handleContinueShopping = () => {
     navigate("/ProductPage");
   };
@@ -48,7 +52,7 @@ const Cart = () => {
                     key={item.id}
                     className="grid grid-cols-4 items-center gap-4 mb-4 p-4 border rounded-lg"
                   >
-                    <div className="flex items-center">
+                    <div className="md:flex inline items-center">
                       <img
                         src={ProductImage}
                         alt="Product"
@@ -78,7 +82,6 @@ const Cart = () => {
                 ))}
               </>
             ) : (
-              // Empty Cart State
               <div className="text-center py-6">
                 <h3 className="text-xl text-gray-700">
                   Your cart is empty! Click Continue Shopping to add items.
@@ -101,7 +104,10 @@ const Cart = () => {
           {/* Summary Section */}
           {cart.length > 0 && (
             <div className="mt-6 md:mt-0 md:ml-6 w-full md:w-1/3">
-              <Summary calculateTotal={calculateTotal} />
+              <Summary 
+                calculateTotal={calculateTotal} 
+                totalQuantity={TotalQuantity()}
+              />
               <button
                 className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
                 onClick={() => navigate("/Checkout")}
