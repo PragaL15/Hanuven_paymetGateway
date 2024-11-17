@@ -1,7 +1,6 @@
-// Counter.jsx
-import React, { useState, useEffect } from 'react';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import React, { useState, useEffect } from "react";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 const Counter = ({ initialCount, onIncrement, onDecrement }) => {
   const [count, setCount] = useState(initialCount);
@@ -24,18 +23,37 @@ const Counter = ({ initialCount, onIncrement, onDecrement }) => {
 
   return (
     <div className="flex items-center justify-center bg-white p-1 rounded border border-gray-300">
-      <button 
-        className="bg-white p-1 cursor-pointer focus:outline-none"
+      {/* Decrement Button */}
+      <button
+        className="bg-white p-1 focus:outline-none cursor-pointer 
+                   sm:p-2" // Larger padding for screens >= sm
         onClick={decrement}
       >
-        <RemoveIcon className="text-black text-sm" />
+        <RemoveIcon
+          className="text-black hover:bg-yellow-100 rounded-full"
+          style={{
+            width: "0.75rem", // Smaller icon size for mobile
+            height: "0.75rem",
+          }}
+        />
       </button>
-      <span className="mx-3 text-lg font-bold">{count}</span>
-      <button 
-        className="bg-white p-1 cursor-pointer focus:outline-none"
+
+      {/* Count Display */}
+      <span className="mx-2 text-sm sm:text-lg">{count}</span> {/* Smaller font size for mobile */}
+
+      {/* Increment Button */}
+      <button
+        className="bg-white p-1 focus:outline-none cursor-pointer 
+                   sm:p-2" // Larger padding for screens >= sm
         onClick={increment}
       >
-        <AddIcon className="text-black text-sm" />
+        <AddIcon
+          className="text-black hover:bg-yellow-100 rounded-full"
+          style={{
+            width: "0.75rem", // Smaller icon size for mobile
+            height: "0.75rem",
+          }}
+        />
       </button>
     </div>
   );
